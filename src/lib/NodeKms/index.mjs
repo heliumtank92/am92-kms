@@ -40,7 +40,8 @@ async function generateDataKey () {
 
     return { dataKey, encryptedDataKey }
   } catch (error) {
-    throw new NodeKmsError(error)
+    const errorCode = `NodeKms::${error.code}`
+    throw new NodeKmsError(error, { errorCode })
   }
 }
 async function generateDataKeyPair () {
@@ -57,7 +58,8 @@ async function generateDataKeyPair () {
     const encryptedPrivateKey = await encrypt(privateKey, encryptOptions)
     return { privateKey, publicKey, encryptedPrivateKey }
   } catch (error) {
-    throw new NodeKmsError(error)
+    const errorCode = `NodeKms::${error.code}`
+    throw new NodeKmsError(error, { errorCode })
   }
 }
 
@@ -76,7 +78,8 @@ async function encrypt (plainText = '', options = {}) {
     const cipherText = cipherTextBuffer.toString(cipherTextFormat)
     return cipherText
   } catch (error) {
-    throw new NodeKmsError(error)
+    const errorCode = `NodeKms::${error.code}`
+    throw new NodeKmsError(error, { errorCode })
   }
 }
 
@@ -96,6 +99,7 @@ async function decrypt (ciphertext = '', options = {}) {
     const plainText = plainTextBuffer.toString(plainTextFormat)
     return plainText
   } catch (error) {
-    throw new NodeKmsError(error)
+    const errorCode = `NodeKms::${error.code}`
+    throw new NodeKmsError(error, { errorCode })
   }
 }

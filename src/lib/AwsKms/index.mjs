@@ -7,7 +7,6 @@ import {
 } from '@aws-sdk/client-kms'
 import AwsKmsError from './AwsKmsError.mjs'
 
-import CONFIG from '../../CONFIG.mjs'
 import {
   GENERATE_DATA_KEY_ERRORS,
   GENERATE_DATA_KEY_PAIR_ERRORS,
@@ -15,102 +14,94 @@ import {
   DECRYPT_ERRORS
 } from './ERRORS.mjs'
 
-const {
-  KEY_PAIR_ALGO,
-  KEY_PAIR_LENGTH,
-  KEY_ALGO,
-  KEY_LENGTH,
-  KEY_FORMAT,
-  PLAIN_TEXT_FORMAT,
-  CIPHER_TEXT_FORMAT,
+export default class AwsKms {
+  constructor (config = {}) {
+    this.config = config
 
-  AWS_KEY_ID,
-  AWS_CONNECTION_CONFIG
-} = CONFIG
+    this.client = new KMSClient(this.config.AWS_CONNECTION_CONFIG)
 
-const KeySpec = `${KEY_ALGO.toUpperCase()}_${KEY_LENGTH}`
-const KeyPairSpec = `${KEY_PAIR_ALGO.toUpperCase()}_${KEY_PAIR_LENGTH}`
-const client = new KMSClient(AWS_CONNECTION_CONFIG)
-
-const AwsKms = {
-  generateDataKey,
-  generateDataKeyPair,
-  encrypt,
-  decrypt
-}
-
-export default AwsKms
-
-async function generateDataKey () {
-  try {
-    const params = { KeyId: AWS_KEY_ID, KeySpec }
-    const command = new GenerateDataKeyCommand(params)
-    const response = await client.send(command)
-
-    const { CiphertextBlob, Plaintext } = response
-    const encryptedDataKey = Buffer.from(CiphertextBlob).toString(KEY_FORMAT)
-    const dataKey = Buffer.from(Plaintext).toString(KEY_FORMAT)
-
-    return { dataKey, encryptedDataKey }
-  } catch (error) {
-    throw new AwsKmsError(error, GENERATE_DATA_KEY_ERRORS)
+    this.generateDataKey = this.generateDataKey.bind(this)
+    this.generateDataKeyPair = this.generateDataKeyPair.bind(this)
+    this.encrypt = this.encrypt.bind(this)
+    this.decrypt = this.decrypt.bind(this)
   }
-}
-async function generateDataKeyPair () {
-  try {
-    const params = { KeyId: AWS_KEY_ID, KeyPairSpec }
-    const command = new GenerateDataKeyPairCommand(params)
-    const response = await client.send(command)
 
-    const {
-      PrivateKeyCiphertextBlob,
-      PrivateKeyPlaintext,
-      PublicKey
-    } = response
-    const encryptedPrivateKey = Buffer.from(PrivateKeyCiphertextBlob).toString(KEY_FORMAT)
-    const privateKey = Buffer.from(PrivateKeyPlaintext).toString(KEY_FORMAT)
-    const publicKey = Buffer.from(PublicKey).toString(KEY_FORMAT)
+  async generateDataKey () {
+    try {
+      const { AWS_KEY_ID, KEY_SPEC, KEY_FORMAT } = this.config
+      const params = { KeyId: AWS_KEY_ID, KeySpec: KEY_SPEC }
+      const command = new GenerateDataKeyCommand(params)
+      const response = await this.client.send(command)
 
-    const data = { privateKey, publicKey, encryptedPrivateKey }
-    return data
-  } catch (error) {
-    throw new AwsKmsError(error, GENERATE_DATA_KEY_PAIR_ERRORS)
+      const { CiphertextBlob, Plaintext } = response
+      const encryptedDataKey = Buffer.from(CiphertextBlob).toString(KEY_FORMAT)
+      const dataKey = Buffer.from(Plaintext).toString(KEY_FORMAT)
+
+      return { dataKey, encryptedDataKey }
+    } catch (error) {
+      throw new AwsKmsError(error, GENERATE_DATA_KEY_ERRORS)
+    }
   }
-}
 
-async function encrypt (Plaintext = '', options = {}) {
-  try {
-    const { cipherTextFormat = CIPHER_TEXT_FORMAT } = options
-    const params = { KeyId: AWS_KEY_ID, Plaintext }
-    const command = new EncryptCommand(params)
-    const response = await client.send(command)
+  async generateDataKeyPair () {
+    try {
+      const { AWS_KEY_ID, KEY_PAIR_SPEC, KEY_FORMAT } = this.config
+      const params = { KeyId: AWS_KEY_ID, KeyPairSpec: KEY_PAIR_SPEC }
+      const command = new GenerateDataKeyPairCommand(params)
+      const response = await this.client.send(command)
 
-    const { CiphertextBlob } = response
-    const ciphertext = Buffer.from(CiphertextBlob).toString(cipherTextFormat)
+      const {
+        PrivateKeyCiphertextBlob,
+        PrivateKeyPlaintext,
+        PublicKey
+      } = response
+      const encryptedPrivateKey = Buffer.from(PrivateKeyCiphertextBlob).toString(KEY_FORMAT)
+      const privateKey = Buffer.from(PrivateKeyPlaintext).toString(KEY_FORMAT)
+      const publicKey = Buffer.from(PublicKey).toString(KEY_FORMAT)
 
-    return ciphertext
-  } catch (error) {
-    throw new AwsKmsError(error, ENCRYPT_ERRORS)
+      const data = { privateKey, publicKey, encryptedPrivateKey }
+      return data
+    } catch (error) {
+      throw new AwsKmsError(error, GENERATE_DATA_KEY_PAIR_ERRORS)
+    }
   }
-}
 
-async function decrypt (Ciphertext = '', options = {}) {
-  try {
-    const {
-      cipherTextFormat = CIPHER_TEXT_FORMAT,
-      plainTextFormat = PLAIN_TEXT_FORMAT
-    } = options
-    const CiphertextBlob = Buffer.from(Ciphertext, cipherTextFormat)
+  async encrypt (Plaintext = '', options = {}) {
+    try {
+      const { AWS_KEY_ID, CIPHER_TEXT_FORMAT } = this.config
+      const { cipherTextFormat = CIPHER_TEXT_FORMAT } = options
+      const params = { KeyId: AWS_KEY_ID, Plaintext }
+      const command = new EncryptCommand(params)
+      const response = await this.client.send(command)
 
-    const params = { KeyId: AWS_KEY_ID, CiphertextBlob }
-    const command = new DecryptCommand(params)
-    const response = await client.send(command)
+      const { CiphertextBlob } = response
+      const ciphertext = Buffer.from(CiphertextBlob).toString(cipherTextFormat)
 
-    const { Plaintext } = response
-    const plaintext = Buffer.from(Plaintext).toString(plainTextFormat)
+      return ciphertext
+    } catch (error) {
+      throw new AwsKmsError(error, ENCRYPT_ERRORS)
+    }
+  }
 
-    return plaintext
-  } catch (error) {
-    throw new AwsKmsError(error, DECRYPT_ERRORS)
+  async decrypt (Ciphertext = '', options = {}) {
+    try {
+      const { AWS_KEY_ID, CIPHER_TEXT_FORMAT, PLAIN_TEXT_FORMAT } = this.config
+      const {
+        cipherTextFormat = CIPHER_TEXT_FORMAT,
+        plainTextFormat = PLAIN_TEXT_FORMAT
+      } = options
+      const CiphertextBlob = Buffer.from(Ciphertext, cipherTextFormat)
+
+      const params = { KeyId: AWS_KEY_ID, CiphertextBlob }
+      const command = new DecryptCommand(params)
+      const response = await this.client.send(command)
+
+      const { Plaintext } = response
+      const plaintext = Buffer.from(Plaintext).toString(plainTextFormat)
+
+      return plaintext
+    } catch (error) {
+      throw new AwsKmsError(error, DECRYPT_ERRORS)
+    }
   }
 }

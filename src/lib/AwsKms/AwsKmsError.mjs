@@ -26,7 +26,7 @@ export default class AwsKmsError extends Error {
     const service = `${pkgName}@${pkgVersion}`
 
     this._isCustomError = true
-    this._isKmsError = true
+    this._isAwsKmsError = true
     this.service = service
     this.message = message || eMessage || DEFAULT_ERROR_MSG
     this.statusCode = statusCode || eStatusCode || DEFAULT_ERROR_STATUS_CODE

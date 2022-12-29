@@ -1,6 +1,6 @@
 {
   "name": "@am92/kms",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Key Management Service",
   "type": "module",
   "main": "src/Kms.mjs",

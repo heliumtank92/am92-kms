@@ -1,22 +1,20 @@
 import crypto from 'crypto'
 import NodeKmsError from './NodeKmsError.mjs'
-import CONSTANTS from './CONSTANTS.mjs'
-import ERRORS from './ERRORS.mjs'
-
-const {
+import {
   VALID_KEY_SPECS,
   VALID_KEY_PAIR_SPECS,
   ENCRYPTION_ALGO,
   MASTER_KEY_LENGTH,
-  MASTER_IV_LENGTH
-} = CONSTANTS
-
-const {
+  MASTER_IV_LENGTH,
+  PRIVATE_KEY_EXPORT_OPTIONS,
+  PUBLIC_KEY_EXPORT_OPTIONS
+} from './CONSTANTS.mjs'
+import {
   INVALID_KEY_SPEC,
   INVALID_KEY_PAIR_SPEC,
   INVALD_MASTER_KEY_HEX,
   INVALID_MASTER_IV_HEX
-} = ERRORS
+} from './ERRORS.mjs'
 
 export default class NodeKms {
   constructor (config = {}) {
@@ -54,8 +52,8 @@ export default class NodeKms {
       const { KEY_PAIR_ALGO, KEY_PAIR_LENGTH, KEY_FORMAT } = this.config
       const options = { modulusLength: KEY_PAIR_LENGTH }
       let { privateKey, publicKey } = crypto.generateKeyPairSync(KEY_PAIR_ALGO, options)
-      privateKey = privateKey.export().toString(KEY_FORMAT)
-      publicKey = publicKey.export().toString(KEY_FORMAT)
+      privateKey = privateKey.export(PRIVATE_KEY_EXPORT_OPTIONS).toString(KEY_FORMAT)
+      publicKey = publicKey.export(PUBLIC_KEY_EXPORT_OPTIONS).toString(KEY_FORMAT)
 
       const encryptOptions = {
         cipherTextFormat: KEY_FORMAT,

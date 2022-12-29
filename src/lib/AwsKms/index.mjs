@@ -8,10 +8,10 @@ import {
 import AwsKmsError from './AwsKmsError.mjs'
 
 import {
-  GENERATE_DATA_KEY_ERRORS,
-  GENERATE_DATA_KEY_PAIR_ERRORS,
-  ENCRYPT_ERRORS,
-  DECRYPT_ERRORS
+  GENERATE_DATA_KEY_ERROR,
+  GENERATE_DATA_KEY_PAIR_ERROR,
+  ENCRYPT_ERROR,
+  DECRYPT_ERROR
 } from './ERRORS.mjs'
 
 export default class AwsKms {
@@ -39,7 +39,7 @@ export default class AwsKms {
 
       return { dataKey, encryptedDataKey }
     } catch (error) {
-      throw new AwsKmsError(error, GENERATE_DATA_KEY_ERRORS)
+      throw new AwsKmsError(error, GENERATE_DATA_KEY_ERROR)
     }
   }
 
@@ -62,7 +62,7 @@ export default class AwsKms {
       const data = { privateKey, publicKey, encryptedPrivateKey }
       return data
     } catch (error) {
-      throw new AwsKmsError(error, GENERATE_DATA_KEY_PAIR_ERRORS)
+      throw new AwsKmsError(error, GENERATE_DATA_KEY_PAIR_ERROR)
     }
   }
 
@@ -79,7 +79,7 @@ export default class AwsKms {
 
       return ciphertext
     } catch (error) {
-      throw new AwsKmsError(error, ENCRYPT_ERRORS)
+      throw new AwsKmsError(error, ENCRYPT_ERROR)
     }
   }
 
@@ -101,7 +101,7 @@ export default class AwsKms {
 
       return plaintext
     } catch (error) {
-      throw new AwsKmsError(error, DECRYPT_ERRORS)
+      throw new AwsKmsError(error, DECRYPT_ERROR)
     }
   }
 }

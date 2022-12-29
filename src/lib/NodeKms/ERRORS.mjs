@@ -1,26 +1,19 @@
-const INVALID_KEY_SPEC = {
+export const INVALID_KEY_SPEC_ERROR = {
   message: 'Invalid Key Spec',
-  errorCode: 'NodeKms::INVALID_KEY_SPEC'
+  errorCode: 'NodeKms::INVALID_KEY_SPEC_ERROR'
 }
 
-const INVALID_KEY_PAIR_SPEC = {
+export const INVALID_KEY_PAIR_SPEC_ERROR = {
   message: 'Invalid Key Pair Spec',
-  errorCode: 'NodeKms::INVALID_KEY_PAIR_SPEC'
+  errorCode: 'NodeKms::INVALID_KEY_PAIR_SPEC_ERROR'
 }
 
-const INVALD_MASTER_KEY_HEX = {
+export const INVALD_MASTER_KEY_HEX_ERROR = {
   message: 'Invald Node Master Key Hex',
-  errorCode: 'NodeKms::INVALD_MASTER_KEY_HEX'
+  errorCode: 'NodeKms::INVALD_MASTER_KEY_HEX_ERROR'
 }
 
-const INVALID_MASTER_IV_HEX = {
+export const INVALID_MASTER_IV_HEX_ERROR = {
   message: 'Invalid Node Master Iv Hex',
-  errorCode: 'NodeKms::INVALID_MASTER_IV_HEX'
-}
-
-export {
-  INVALID_KEY_SPEC,
-  INVALID_KEY_PAIR_SPEC,
-  INVALD_MASTER_KEY_HEX,
-  INVALID_MASTER_IV_HEX
+  errorCode: 'NodeKms::INVALID_MASTER_IV_HEX_ERROR'
 }

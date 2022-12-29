@@ -9,11 +9,12 @@ import {
   PRIVATE_KEY_EXPORT_OPTIONS,
   PUBLIC_KEY_EXPORT_OPTIONS
 } from './CONSTANTS.mjs'
+
 import {
-  INVALID_KEY_SPEC,
-  INVALID_KEY_PAIR_SPEC,
-  INVALD_MASTER_KEY_HEX,
-  INVALID_MASTER_IV_HEX
+  INVALID_KEY_SPEC_ERROR,
+  INVALID_KEY_PAIR_SPEC_ERROR,
+  INVALD_MASTER_KEY_HEX_ERROR,
+  INVALID_MASTER_IV_HEX_ERROR
 } from './ERRORS.mjs'
 
 export default class NodeKms {
@@ -124,11 +125,11 @@ function deriveConfig (config) {
   const { KEY_SPEC, KEY_PAIR_SPEC, MASTER_KEY_HEX, MASTER_IV_HEX } = config
 
   if (!VALID_KEY_SPECS.includes(KEY_SPEC)) {
-    throw new NodeKmsError({ KEY_SPEC }, INVALID_KEY_SPEC)
+    throw new NodeKmsError({ KEY_SPEC }, INVALID_KEY_SPEC_ERROR)
   }
 
   if (!VALID_KEY_PAIR_SPECS.includes(KEY_PAIR_SPEC)) {
-    throw new NodeKmsError({ KEY_PAIR_SPEC }, INVALID_KEY_PAIR_SPEC)
+    throw new NodeKmsError({ KEY_PAIR_SPEC }, INVALID_KEY_PAIR_SPEC_ERROR)
   }
 
   const keySpecArray = KEY_SPEC.split('_')
@@ -143,11 +144,11 @@ function deriveConfig (config) {
   const MASTER_IV_BUFFER = Buffer.from(MASTER_IV_HEX, 'hex')
 
   if (MASTER_KEY_BUFFER.length !== MASTER_KEY_LENGTH) {
-    throw new NodeKmsError({ MASTER_KEY_HEX }, INVALD_MASTER_KEY_HEX)
+    throw new NodeKmsError({ MASTER_KEY_HEX }, INVALD_MASTER_KEY_HEX_ERROR)
   }
 
   if (MASTER_IV_BUFFER.length !== MASTER_IV_LENGTH) {
-    throw new NodeKmsError({ MASTER_IV_HEX }, INVALID_MASTER_IV_HEX)
+    throw new NodeKmsError({ MASTER_IV_HEX }, INVALID_MASTER_IV_HEX_ERROR)
   }
 
   return {

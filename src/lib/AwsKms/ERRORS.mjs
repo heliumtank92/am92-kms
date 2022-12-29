@@ -1,22 +1,15 @@
-const GENERATE_DATA_KEY_ERRORS = {
-  errorCode: 'AwsKms::GENERATE_DATA_KEY_ERRORS'
+export const GENERATE_DATA_KEY_ERROR = {
+  errorCode: 'AwsKms::GENERATE_DATA_KEY_ERROR'
 }
 
-const GENERATE_DATA_KEY_PAIR_ERRORS = {
-  errorCode: 'AwsKms::GENERATE_DATA_KEY_PAIR_ERRORS'
+export const GENERATE_DATA_KEY_PAIR_ERROR = {
+  errorCode: 'AwsKms::GENERATE_DATA_KEY_PAIR_ERROR'
 }
 
-const ENCRYPT_ERRORS = {
-  errorCode: 'AwsKms::ENCRYPT_ERRORS'
+export const ENCRYPT_ERROR = {
+  errorCode: 'AwsKms::ENCRYPT_ERROR'
 }
 
-const DECRYPT_ERRORS = {
-  errorCode: 'AwsKms::DECRYPT_ERRORS'
-}
-
-export {
-  GENERATE_DATA_KEY_ERRORS,
-  GENERATE_DATA_KEY_PAIR_ERRORS,
-  ENCRYPT_ERRORS,
-  DECRYPT_ERRORS
+export const DECRYPT_ERROR = {
+  errorCode: 'AwsKms::DECRYPT_ERROR'
 }

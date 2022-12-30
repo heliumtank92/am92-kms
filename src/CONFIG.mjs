@@ -17,6 +17,7 @@ const {
 const ENABLED = KMS_ENABLED === 'true'
 
 const REQUIRED_CONFIG = []
+const MISSING_CONFIGS = []
 
 if (ENABLED) {
   if (KMS_TYPE === 'NODE') {
@@ -30,10 +31,14 @@ if (ENABLED) {
 
 REQUIRED_CONFIG.forEach(function (key) {
   if (!process.env[key]) {
-    console.error('[Error] Kms Config Missing:', key)
-    return process.exit(1)
+    MISSING_CONFIGS.push(key)
   }
 })
+
+if (MISSING_CONFIGS.length) {
+  console.error(`Missing Kms Configs: ${MISSING_CONFIGS.join(', ')}`)
+  process.exit(1)
+}
 
 const CONFIG = {
   ENABLED,

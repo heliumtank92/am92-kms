@@ -1,12 +1,11 @@
 {
   "name": "@am92/kms",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Key Management Service",
   "type": "module",
   "main": "src/Kms.mjs",
   "scripts": {
-    "preinstall": "npx only-allow pnpm",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "repository": "git@github.com:heliumtank92/am92-kms.git",
   "homepage": "https://github.com/heliumtank92/am92-kms#readme",
@@ -28,6 +27,12 @@
   },
   "dependencies": {
     "@aws-sdk/client-kms": "^3.238.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.20.7",
+    "@babel/preset-env": "^7.20.2",
+    "babel-jest": "^29.3.1",
+    "jest": "^29.3.1"
   },
   "keywords": [
     "kms",

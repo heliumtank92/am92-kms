@@ -1,0 +1,26 @@
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.VALID_KEY_SPECS = exports.VALID_KEY_PAIR_SPECS = exports.PUBLIC_KEY_EXPORT_OPTIONS = exports.PRIVATE_KEY_EXPORT_OPTIONS = exports.MASTER_KEY_LENGTH = exports.MASTER_IV_LENGTH = exports.ENCRYPTION_ALGO = void 0;
+var VALID_KEY_SPECS = ['AES_128', 'AES_256'];
+exports.VALID_KEY_SPECS = VALID_KEY_SPECS;
+var VALID_KEY_PAIR_SPECS = ['RSA_2048', 'RSA_3072', 'RSA_4096'];
+exports.VALID_KEY_PAIR_SPECS = VALID_KEY_PAIR_SPECS;
+var ENCRYPTION_ALGO = 'aes-256-cbc';
+exports.ENCRYPTION_ALGO = ENCRYPTION_ALGO;
+var MASTER_KEY_LENGTH = 32;
+exports.MASTER_KEY_LENGTH = MASTER_KEY_LENGTH;
+var MASTER_IV_LENGTH = 16;
+exports.MASTER_IV_LENGTH = MASTER_IV_LENGTH;
+var PRIVATE_KEY_EXPORT_OPTIONS = {
+  type: 'pkcs1',
+  format: 'der'
+};
+exports.PRIVATE_KEY_EXPORT_OPTIONS = PRIVATE_KEY_EXPORT_OPTIONS;
+var PUBLIC_KEY_EXPORT_OPTIONS = {
+  type: 'spki',
+  format: 'der'
+};
+exports.PUBLIC_KEY_EXPORT_OPTIONS = PUBLIC_KEY_EXPORT_OPTIONS;

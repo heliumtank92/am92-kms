@@ -1,3 +1,5 @@
+import { SERVICE } from '../../CONFIG.mjs'
+
 const DEFAULT_ERROR_MSG = 'Aws Kms Error'
 const DEFAULT_ERROR_STATUS_CODE = 500
 const DEFAULT_ERROR_CODE = 'AWS_KMS_ERROR'
@@ -19,15 +21,9 @@ export default class AwsKmsError extends Error {
       } = {}
     } = e
 
-    const {
-      npm_package_name: pkgName = '',
-      npm_package_version: pkgVersion = ''
-    } = process.env
-    const service = `${pkgName}@${pkgVersion}`
-
     this._isCustomError = true
     this._isAwsKmsError = true
-    this.service = service
+    this.service = SERVICE
     this.message = message || eMessage || DEFAULT_ERROR_MSG
     this.statusCode = statusCode || eStatusCode || DEFAULT_ERROR_STATUS_CODE
     this.errorCode = errorCode || DEFAULT_ERROR_CODE

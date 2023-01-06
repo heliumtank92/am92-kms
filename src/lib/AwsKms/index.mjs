@@ -8,6 +8,7 @@ import {
 import AwsKmsError from './AwsKmsError.mjs'
 
 import {
+  INVALID_CONFIG_ERROR,
   GENERATE_DATA_KEY_ERROR,
   GENERATE_DATA_KEY_PAIR_ERROR,
   ENCRYPT_ERROR,
@@ -17,6 +18,10 @@ import {
 export default class AwsKms {
   constructor (config = {}) {
     this.config = config
+
+    if (!this.config.AWS_KEY_ID) {
+      throw new AwsKmsError(this.config, INVALID_CONFIG_ERROR)
+    }
 
     this.client = new KMSClient(this.config.AWS_CONNECTION_CONFIG)
 

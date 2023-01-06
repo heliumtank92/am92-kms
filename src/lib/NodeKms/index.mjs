@@ -11,6 +11,7 @@ import {
 } from './CONSTANTS.mjs'
 
 import {
+  INVALID_CONFIG_ERROR,
   INVALID_KEY_SPEC_ERROR,
   INVALID_KEY_PAIR_SPEC_ERROR,
   INVALD_MASTER_KEY_HEX_ERROR,
@@ -19,6 +20,10 @@ import {
 
 export default class NodeKms {
   constructor (config = {}) {
+    if (!config.MASTER_KEY_HEX) {
+      throw new NodeKmsError(this.config, INVALID_CONFIG_ERROR)
+    }
+
     const derivedConfig = deriveConfig(config)
     this.config = { ...config, ...derivedConfig }
 

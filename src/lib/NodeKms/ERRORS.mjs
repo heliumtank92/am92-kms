@@ -1,3 +1,8 @@
+export const INVALID_CONFIG_ERROR = {
+  message: 'Invalid Config',
+  errorCode: 'NodeKms::INVALID_CONFIG'
+}
+
 export const INVALID_KEY_SPEC_ERROR = {
   message: 'Invalid Key Spec',
   errorCode: 'NodeKms::INVALID_KEY_SPEC'

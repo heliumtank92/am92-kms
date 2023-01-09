@@ -14,10 +14,7 @@ export default class AwsKmsError extends Error {
     const {
       message: eMessage,
       $metadata: {
-        httpStatusCode: eStatusCode = 500,
-        cfId,
-        extendedRequestId,
-        requestId
+        httpStatusCode: eStatusCode = 500
       } = {}
     } = e
 
@@ -30,10 +27,7 @@ export default class AwsKmsError extends Error {
     this.error = {
       ...e,
       message: eMessage || this.message,
-      errorCode: this.errorCode,
-      cfId,
-      extendedRequestId,
-      requestId
+      errorCode: this.errorCode
     }
   }
 }

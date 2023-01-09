@@ -1,4 +1,7 @@
 const {
+  npm_package_name: pkgName = '',
+  npm_package_version: pkgVersion = '',
+
   KMS_ENABLED = 'false',
   KMS_TYPE = '',
   KMS_KEY_SPEC = 'AES_256',
@@ -14,6 +17,9 @@ const {
   KMS_AWS_KEY_ID = ''
 } = process.env
 
+const SERVICE = `${pkgName}@${pkgVersion}`
+const logFunc = console.fatal || console.error
+
 const ENABLED = KMS_ENABLED === 'true'
 
 const REQUIRED_CONFIG = []
@@ -22,10 +28,11 @@ const MISSING_CONFIGS = []
 if (ENABLED) {
   if (KMS_TYPE === 'NODE') {
     REQUIRED_CONFIG.push('KMS_MASTER_KEY')
-  }
-
-  if (KMS_TYPE === 'AWS') {
+  } else if (KMS_TYPE === 'AWS') {
     REQUIRED_CONFIG.push('KMS_AWS_KEY_ID')
+  } else {
+    logFunc(`[${SERVICE} Kms] Invalid Kms Config KMS_TYPE. Must be either 'NODE' or 'AWS'`)
+    process.exit(1)
   }
 }
 
@@ -36,7 +43,7 @@ REQUIRED_CONFIG.forEach(function (key) {
 })
 
 if (MISSING_CONFIGS.length) {
-  console.error(`Missing Kms Configs: ${MISSING_CONFIGS.join(', ')}`)
+  logFunc(`[${SERVICE} Kms] Kms Config Missing: ${MISSING_CONFIGS.join(', ')}`)
   process.exit(1)
 }
 
@@ -59,11 +66,5 @@ const CONFIG = {
 }
 
 export default CONFIG
-
-const {
-  npm_package_name: pkgName = '',
-  npm_package_version: pkgVersion = ''
-} = process.env
-const SERVICE = `${pkgName}@${pkgVersion}`
 
 export { SERVICE }

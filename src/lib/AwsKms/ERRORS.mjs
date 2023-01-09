@@ -1,3 +1,8 @@
+export const INVALID_CONFIG_ERROR = {
+  message: 'Invalid Config',
+  errorCode: 'AwsKms::INVALID_CONFIG'
+}
+
 export const GENERATE_DATA_KEY_ERROR = {
   errorCode: 'AwsKms::GENERATE_DATA_KEY'
 }

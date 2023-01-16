@@ -24,10 +24,6 @@ export default class AwsKmsError extends Error {
     this.message = message || eMessage || DEFAULT_ERROR_MSG
     this.statusCode = statusCode || eStatusCode || DEFAULT_ERROR_STATUS_CODE
     this.errorCode = errorCode || DEFAULT_ERROR_CODE
-    this.error = {
-      ...e,
-      message: eMessage || this.message,
-      errorCode: this.errorCode
-    }
+    this.error = e
   }
 }

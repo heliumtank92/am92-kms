@@ -8,19 +8,28 @@ export default class Kms {
   constructor (config = {}) {
     const kmsConfig = { ...CONFIG, ...config }
     const { TYPE } = kmsConfig
+    let kms
 
     switch (TYPE) {
       case 'AWS': {
-        return new AwsKms(kmsConfig)
+        kms = new AwsKms(kmsConfig)
+        break
       }
 
       case 'NODE': {
-        return new NodeKms(kmsConfig)
+        kms = new NodeKms(kmsConfig)
+        break
       }
 
       default: {
         throw new KmsError(config, INVALID_CONFIG_ERROR)
       }
     }
+
+    this.config = kms.config
+    this.generateDataKey = kms.generateDataKey
+    this.generateDataKeyPair = kms.generateDataKeyPair
+    this.encrypt = kms.encrypt
+    this.decrypt = kms.decrypt
   }
 }

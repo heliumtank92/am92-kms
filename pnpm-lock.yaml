@@ -2,9 +2,13 @@ lockfileVersion: 5.4
 
 specifiers:
   '@aws-sdk/client-kms': ^3.272.0
+  '@types/node': ^18.14.6
 
 dependencies:
   '@aws-sdk/client-kms': 3.272.0
+
+devDependencies:
+  '@types/node': 18.14.6
 
 packages:
 
@@ -721,6 +725,10 @@ packages:
       '@aws-sdk/util-buffer-from': 3.208.0
       tslib: 2.5.0
     dev: false
+
+  /@types/node/18.14.6:
+    resolution: {integrity: sha512-93+VvleD3mXwlLI/xASjw0FzKcwzl3OdTCzm1LaRfqgS21gfFtK3zDXM5Op9TeeMsJVOaJ2VRDpT9q4Y3d0AvA==}
+    dev: true
 
   /bowser/2.11.0:
     resolution: {integrity: sha512-AlcaJBi/pqqJBIQ8U9Mcpc9i8Aqxn88Skv5d+xBX006BY5u8N3mGLHa5Lgppa7L/HfwgwLgZ6NYs+Ag6uUmJRA==}

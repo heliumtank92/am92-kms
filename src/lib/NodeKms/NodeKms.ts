@@ -1,5 +1,5 @@
 import crypto from 'crypto'
-import NodeKmsError from './NodeKmsError.mjs'
+import NodeKmsError from './NodeKmsError'
 import {
   VALID_KEY_SPECS,
   VALID_KEY_PAIR_SPECS,
@@ -8,7 +8,7 @@ import {
   MASTER_IV_LENGTH,
   PRIVATE_KEY_EXPORT_OPTIONS,
   PUBLIC_KEY_EXPORT_OPTIONS
-} from './CONSTANTS.mjs'
+} from './CONSTANTS'
 
 import {
   INVALID_CONFIG_ERROR,
@@ -16,16 +16,20 @@ import {
   INVALID_KEY_PAIR_SPEC_ERROR,
   INVALD_MASTER_KEY_HEX_ERROR,
   INVALID_MASTER_IV_HEX_ERROR
-} from './ERRORS.mjs'
+} from './ERRORS'
+import {
+  DataKeyObject,
+  DataKeyPairObject,
+  EncryptDecryptOptions,
+  NodeKmsConfig,
+  NodeKmsExtendedConfig
+} from '../../TYPES'
 
 export default class NodeKms {
-  constructor (config = {}) {
-    if (!config.MASTER_KEY_HEX) {
-      throw new NodeKmsError(this.config, INVALID_CONFIG_ERROR)
-    }
+  CONFIG: NodeKmsExtendedConfig
 
-    const derivedConfig = deriveConfig(config)
-    this.config = { ...config, ...derivedConfig }
+  constructor(config: NodeKmsConfig) {
+    this.CONFIG = validateConfigAndExtend(config)
 
     this.generateDataKey = this.generateDataKey.bind(this)
     this.generateDataKeyPair = this.generateDataKeyPair.bind(this)
@@ -33,9 +37,9 @@ export default class NodeKms {
     this.decrypt = this.decrypt.bind(this)
   }
 
-  async generateDataKey () {
+  async generateDataKey() {
     try {
-      const { KEY_ALGO, KEY_LENGTH, KEY_FORMAT } = this.config
+      const { KEY_ALGO, KEY_LENGTH, KEY_FORMAT } = this.CONFIG
       const options = { length: KEY_LENGTH }
       const keyObject = crypto.generateKeySync(KEY_ALGO, options)
       const dataKey = keyObject.export().toString(KEY_FORMAT)
@@ -46,40 +50,53 @@ export default class NodeKms {
       }
       const encryptedDataKey = await this.encrypt(dataKey, encryptOptions)
 
-      return { dataKey, encryptedDataKey }
-    } catch (error) {
+      const dataKeyObject: DataKeyObject = { dataKey, encryptedDataKey }
+      return dataKeyObject
+    } catch (error: any) {
       const errorCode = `NodeKms::${error.code}`
       throw new NodeKmsError(error, { errorCode })
     }
   }
 
-  async generateDataKeyPair () {
+  async generateDataKeyPair() {
     try {
-      const { KEY_PAIR_ALGO, KEY_PAIR_LENGTH, KEY_FORMAT } = this.config
+      const { KEY_PAIR_ALGO, KEY_PAIR_LENGTH, KEY_FORMAT } = this.CONFIG
       const options = { modulusLength: KEY_PAIR_LENGTH }
-      let { privateKey, publicKey } = crypto.generateKeyPairSync(KEY_PAIR_ALGO, options)
-      privateKey = privateKey.export(PRIVATE_KEY_EXPORT_OPTIONS).toString(KEY_FORMAT)
-      publicKey = publicKey.export(PUBLIC_KEY_EXPORT_OPTIONS).toString(KEY_FORMAT)
+      const keyObjects = crypto.generateKeyPairSync(KEY_PAIR_ALGO, options)
+      const privateKey = keyObjects.privateKey
+        .export(PRIVATE_KEY_EXPORT_OPTIONS)
+        .toString(KEY_FORMAT)
+      const publicKey = keyObjects.publicKey
+        .export(PUBLIC_KEY_EXPORT_OPTIONS)
+        .toString(KEY_FORMAT)
 
       const encryptOptions = {
         cipherTextFormat: KEY_FORMAT,
         plainTextFormat: KEY_FORMAT
       }
       const encryptedPrivateKey = await this.encrypt(privateKey, encryptOptions)
-      return { privateKey, publicKey, encryptedPrivateKey }
-    } catch (error) {
+      const dataKeyPairObject: DataKeyPairObject = {
+        privateKey,
+        publicKey,
+        encryptedPrivateKey
+      }
+      return dataKeyPairObject
+    } catch (error: any) {
       const errorCode = `NodeKms::${error.code}`
       throw new NodeKmsError(error, { errorCode })
     }
   }
 
-  async encrypt (plainText = '', options = {}) {
+  async encrypt(
+    plainText: string = '',
+    options: EncryptDecryptOptions = {}
+  ): Promise<string> {
     const {
       MASTER_KEY_BUFFER,
       MASTER_IV_BUFFER,
       CIPHER_TEXT_FORMAT,
       PLAIN_TEXT_FORMAT
-    } = this.config
+    } = this.CONFIG
 
     const {
       cipherTextFormat = CIPHER_TEXT_FORMAT,
@@ -87,23 +104,33 @@ export default class NodeKms {
     } = options
 
     try {
-      const encryptor = crypto.createCipheriv(ENCRYPTION_ALGO, MASTER_KEY_BUFFER, MASTER_IV_BUFFER)
-      const cipherTextBuffer = Buffer.concat([encryptor.update(plainText, plainTextFormat), encryptor.final()])
+      const encryptor = crypto.createCipheriv(
+        ENCRYPTION_ALGO,
+        MASTER_KEY_BUFFER,
+        MASTER_IV_BUFFER
+      )
+      const cipherTextBuffer = Buffer.concat([
+        encryptor.update(plainText, plainTextFormat),
+        encryptor.final()
+      ])
       const cipherText = cipherTextBuffer.toString(cipherTextFormat)
       return cipherText
-    } catch (error) {
+    } catch (error: any) {
       const errorCode = `NodeKms::${error.code}`
       throw new NodeKmsError(error, { errorCode })
     }
   }
 
-  async decrypt (ciphertext = '', options = {}) {
+  async decrypt(
+    ciphertext: string = '',
+    options: EncryptDecryptOptions = {}
+  ): Promise<string> {
     const {
       MASTER_KEY_HEX,
       MASTER_IV_HEX,
       CIPHER_TEXT_FORMAT,
       PLAIN_TEXT_FORMAT
-    } = this.config
+    } = this.CONFIG
 
     const {
       cipherTextFormat = CIPHER_TEXT_FORMAT,
@@ -115,19 +142,30 @@ export default class NodeKms {
     const cipherTextBuffer = Buffer.from(ciphertext, cipherTextFormat)
 
     try {
-      const decryptor = crypto.createDecipheriv(ENCRYPTION_ALGO, keyBuffer, ivBuffer)
-      const plainTextBuffer = Buffer.concat([decryptor.update(cipherTextBuffer), decryptor.final()])
+      const decryptor = crypto.createDecipheriv(
+        ENCRYPTION_ALGO,
+        keyBuffer,
+        ivBuffer
+      )
+      const plainTextBuffer = Buffer.concat([
+        decryptor.update(cipherTextBuffer),
+        decryptor.final()
+      ])
       const plainText = plainTextBuffer.toString(plainTextFormat)
       return plainText
-    } catch (error) {
+    } catch (error: any) {
       const errorCode = `NodeKms::${error.code}`
       throw new NodeKmsError(error, { errorCode })
     }
   }
 }
 
-function deriveConfig (config) {
+function validateConfigAndExtend(config: NodeKmsConfig): NodeKmsExtendedConfig {
   const { KEY_SPEC, KEY_PAIR_SPEC, MASTER_KEY_HEX, MASTER_IV_HEX } = config
+
+  if (!MASTER_KEY_HEX) {
+    throw new NodeKmsError(config, INVALID_CONFIG_ERROR)
+  }
 
   if (!VALID_KEY_SPECS.includes(KEY_SPEC)) {
     throw new NodeKmsError({ KEY_SPEC }, INVALID_KEY_SPEC_ERROR)
@@ -138,11 +176,13 @@ function deriveConfig (config) {
   }
 
   const keySpecArray = KEY_SPEC.split('_')
-  const KEY_ALGO = keySpecArray[0].toLowerCase()
+  const KEY_ALGO = 'aes'
+  // TODO: const KEY_ALGO = keySpecArray[0].toLowerCase()
   const KEY_LENGTH = parseInt(keySpecArray[1], 10)
 
   const keyPairSpecArray = KEY_PAIR_SPEC.split('_')
-  const KEY_PAIR_ALGO = keyPairSpecArray[0].toLowerCase()
+  const KEY_PAIR_ALGO = 'rsa'
+  // TODO: const KEY_PAIR_ALGO = keyPairSpecArray[0].toLowerCase()
   const KEY_PAIR_LENGTH = parseInt(keyPairSpecArray[1], 10)
 
   const MASTER_KEY_BUFFER = Buffer.from(MASTER_KEY_HEX, 'hex')
@@ -156,7 +196,8 @@ function deriveConfig (config) {
     throw new NodeKmsError({ MASTER_IV_HEX }, INVALID_MASTER_IV_HEX_ERROR)
   }
 
-  return {
+  const extendedConfig: NodeKmsExtendedConfig = {
+    ...config,
     KEY_ALGO,
     KEY_LENGTH,
     KEY_PAIR_ALGO,
@@ -164,4 +205,6 @@ function deriveConfig (config) {
     MASTER_KEY_BUFFER,
     MASTER_IV_BUFFER
   }
+
+  return extendedConfig
 }

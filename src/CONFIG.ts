@@ -1,3 +1,6 @@
+import { KmsConfig } from './TYPES'
+
+/** @ignore */
 const {
   npm_package_name: pkgName = '',
   npm_package_version: pkgVersion = '',
@@ -17,21 +20,34 @@ const {
   KMS_AWS_KEY_ID = ''
 } = process.env
 
-const SERVICE = `${pkgName}@${pkgVersion}`
-const logFunc = console.fatal || console.error
+/** @ignore */
+export const SERVICE = `${pkgName}@${pkgVersion}`
 
+/** @ignore */
 const ENABLED = KMS_ENABLED === 'true'
 
-const REQUIRED_CONFIG = []
-const MISSING_CONFIGS = []
+/** @ignore */
+const REQUIRED_CONFIG: string[] = []
+/** @ignore */
+const MISSING_CONFIGS: string[] = []
+
+/** @ignore */
+const fatalLogFunc = console.fatal || console.error
+
+/** @ignore */
+let TYPE = ''
 
 if (ENABLED) {
   if (KMS_TYPE === 'NODE') {
+    TYPE = 'NODE'
     REQUIRED_CONFIG.push('KMS_MASTER_KEY')
   } else if (KMS_TYPE === 'AWS') {
+    TYPE = 'AWS'
     REQUIRED_CONFIG.push('KMS_AWS_KEY_ID')
   } else {
-    logFunc(`[${SERVICE} Kms] Invalid Kms Config KMS_TYPE. Must be either 'NODE' or 'AWS'`)
+    fatalLogFunc(
+      `[${SERVICE} Kms] Invalid Kms Config KMS_TYPE. Must be either 'NODE' or 'AWS'`
+    )
     process.exit(1)
   }
 }
@@ -43,19 +59,22 @@ REQUIRED_CONFIG.forEach(function (key) {
 })
 
 if (MISSING_CONFIGS.length) {
-  logFunc(`[${SERVICE} Kms] Kms Config Missing: ${MISSING_CONFIGS.join(', ')}`)
+  fatalLogFunc(
+    `[${SERVICE} Kms] Kms Config Missing: ${MISSING_CONFIGS.join(', ')}`
+  )
   process.exit(1)
 }
 
-const CONFIG = {
+/** @ignore */
+const CONFIG: KmsConfig = {
   ENABLED,
   TYPE: KMS_TYPE,
   KEY_SPEC: KMS_KEY_SPEC,
   KEY_PAIR_SPEC: KMS_KEY_PAIR_SPEC,
 
-  KEY_FORMAT: KMS_KEY_FORMAT,
-  PLAIN_TEXT_FORMAT: KMS_PLAIN_TEXT_FORMAT,
-  CIPHER_TEXT_FORMAT: KMS_CIPHER_TEXT_FORMAT,
+  KEY_FORMAT: KMS_KEY_FORMAT as BufferEncoding,
+  PLAIN_TEXT_FORMAT: KMS_PLAIN_TEXT_FORMAT as BufferEncoding,
+  CIPHER_TEXT_FORMAT: KMS_CIPHER_TEXT_FORMAT as BufferEncoding,
 
   MASTER_KEY_HEX: KMS_MASTER_KEY_HEX,
   MASTER_IV_HEX: KMS_MASTER_IV_HEX,
@@ -66,5 +85,3 @@ const CONFIG = {
 }
 
 export default CONFIG
-
-export { SERVICE }

@@ -40,9 +40,22 @@
 <a href="https://bundlephobia.com/package/@am92/kms"><img src="https://img.shields.io/bundlephobia/minzip/@am92/kms?style=for-the-badge" alt="Bundle Size" class="img-responsive"></a></p>
 <br />
 
+<p>This package provides Key Management related functionalities using either Node Crypto or AWS KMS. It provides the following functionalities:</p>
+<ul>
+<li>Generating Encryption Key for Symmetric and Asymmetric Algorithms</li>
+<li>Encrypting and Decrypting data using:<ul>
+<li>Defined Master Key and Master IV in case of Node Crypto</li>
+<li>KMS defined Master Key and IV in case of AWS KMS</li>
+</ul>
+</li>
+</ul>
+<br />
+
 <h2>Table of Content</h2>
 <ul>
 <li><a href="#installation">Installation</a></li>
+<li><a href="#environment-variables">Environment Variables</a></li>
+<li><a href="#creating-a-kms-instance">Creating a KMS Instance</a></li>
 <li><a href="#contributors">Contributors</a></li>
 <li><a href="#resources">Resources</a></li>
 <li><a href="#license">License</a></li>
@@ -51,6 +64,41 @@
 
 <h2>Installation</h2>
 <div><pre class="line-numbers"><code class="language-bash">$ npm install --save &#64;am92/kms</code></pre></div><br />
+
+<h2>Environment Variables</h2>
+<p>The following environment variables need to be set to work with this package:</p>
+<div><pre class="line-numbers"><code class="language-sh">##### KMS Config
+export KMS_ENABLED=false
+export KMS_TYPE=&#39;&#39;
+export KMS_KEY_SPEC=&#39;AES_256&#39;
+export KMS_KEY_PAIR_SPEC=&#39;RSA_2048&#39;
+export KMS_KEY_FORMAT=&#39;base64&#39;
+export KMS_PLAIN_TEXT_FORMAT=&#39;base64&#39;
+export KMS_CIPHER_TEXT_FORMAT=&#39;base64&#39;
+export KMS_MASTER_KEY_HEX=&#39;0000000000000000000000000000000000000000000000000000000000000000&#39;
+export KMS_MASTER_IV_HEX=&#39;00000000000000000000000000000000&#39;
+export KMS_AWS_REGION=&#39;ap-south-1&#39;
+export KMS_AWS_KEY_ID=&#39;&#39;</code></pre></div><p><em>Note:</em></p>
+<ul>
+<li><em>If &#39;KMS_ENABLED&#39; is set to &#39;true&#39;, &#39;KMS_TYPE&#39; is required. Possible values are &#39;NODE&#39; and &#39;AWS&#39;</em></li>
+<li><em>If &#39;KMS_TYPE&#39; is set to &#39;AWS&#39;, &#39;KMS_AWS_KEY_ID&#39;is required</em></li>
+<li><em>Variables where values have been defined can be omitted from being defined as the mentioned values are internally defaulted.</em></li>
+</ul>
+<br />
+
+<h2>Creating a KMS Instance</h2>
+<div><pre class="line-numbers"><code class="language-javascript">import Kms from &#39;&#64;am92/kms&#39;
+
+const kms = new Kms()
+export default kms</code></pre></div><p>If you wish to pass your custom &#39;config&#39; to Kms Class, then you can build it as follows:</p>
+<div><pre class="line-numbers"><code class="language-javascript">import Kms from &#39;&#64;am92/kms&#39;
+
+const config = {
+  KMS_TYPE: &#39;NODE&#39;
+}
+
+const kms = new Kms(config)
+export default kms</code></pre></div><br />
 
 <h2>Contributors</h2>
 <table>
@@ -77,6 +125,9 @@
 <br />
 
 <h2>Resources</h2>
+<ul>
+<li><a href="https://www.npmjs.com/package/@aws-sdk/client-kms">AWS SDK - KMS Client</a></li>
+</ul>
 <br />
 
 <h2>License</h2>

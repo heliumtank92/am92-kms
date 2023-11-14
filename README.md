@@ -9,8 +9,18 @@
 
 <br />
 
+This package provides Key Management related functionalities using either Node Crypto or AWS KMS. It provides the following functionalities:
+* Generating Encryption Key for Symmetric and Asymmetric Algorithms
+* Encrypting and Decrypting data using:
+  * Defined Master Key and Master IV in case of Node Crypto
+  * KMS defined Master Key and IV in case of AWS KMS
+
+<br />
+
 ## Table of Content
 - [Installation](#installation)
+- [Environment Variables](#environment-variables)
+- [Creating a KMS Instance](#creating-a-kms-instance)
 - [Contributors](#contributors)
 - [Resources](#resources)
 - [License](#license)
@@ -21,6 +31,53 @@
 ```bash
 $ npm install --save @am92/kms
 ```
+<br />
+
+## Environment Variables
+The following environment variables need to be set to work with this package:
+```sh
+##### KMS Config
+export KMS_ENABLED=false
+export KMS_TYPE=''
+export KMS_KEY_SPEC='AES_256'
+export KMS_KEY_PAIR_SPEC='RSA_2048'
+export KMS_KEY_FORMAT='base64'
+export KMS_PLAIN_TEXT_FORMAT='base64'
+export KMS_CIPHER_TEXT_FORMAT='base64'
+export KMS_MASTER_KEY_HEX='0000000000000000000000000000000000000000000000000000000000000000'
+export KMS_MASTER_IV_HEX='00000000000000000000000000000000'
+export KMS_AWS_REGION='ap-south-1'
+export KMS_AWS_KEY_ID=''
+```
+
+*Note:*
+* *If 'KMS_ENABLED' is set to 'true', 'KMS_TYPE' is required. Possible values are 'NODE' and 'AWS'*
+* *If 'KMS_TYPE' is set to 'AWS', 'KMS_AWS_KEY_ID'is required*
+* *Variables where values have been defined can be omitted from being defined as the mentioned values are internally defaulted.*
+
+<br />
+
+## Creating a KMS Instance
+```javascript
+import Kms from '@am92/kms'
+
+const kms = new Kms()
+export default kms
+```
+
+If you wish to pass your custom 'config' to Kms Class, then you can build it as follows:
+
+```javascript
+import Kms from '@am92/kms'
+
+const config = {
+  KMS_TYPE: 'NODE'
+}
+
+const kms = new Kms(config)
+export default kms
+```
+
 <br />
 
 ## Contributors
@@ -48,6 +105,7 @@ $ npm install --save @am92/kms
 <br />
 
 ## Resources
+* [AWS SDK - KMS Client](https://www.npmjs.com/package/@aws-sdk/client-kms)
 
 <br />
 

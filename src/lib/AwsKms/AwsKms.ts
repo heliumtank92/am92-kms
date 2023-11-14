@@ -48,7 +48,8 @@ export default class AwsKms {
    */
   constructor(config: AwsKmsConfig) {
     this.CONFIG = validateConfig(config)
-    this.client = new KMSClient(this.CONFIG.AWS_CONNECTION_CONFIG)
+    const { AWS_CONNECTION_CONFIG = {} } = this.CONFIG
+    this.client = new KMSClient(AWS_CONNECTION_CONFIG)
 
     this.generateDataKey = this.generateDataKey.bind(this)
     this.generateDataKeyPair = this.generateDataKeyPair.bind(this)

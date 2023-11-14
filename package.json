@@ -1,6 +1,6 @@
 {
   "name": "@am92/kms",
-  "version": "1.1.1",
+  "version": "2.0.0",
   "description": "Key Management Service",
   "sideEffects": false,
   "types": "dist/index.d.ts",

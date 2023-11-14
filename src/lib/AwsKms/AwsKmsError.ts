@@ -21,6 +21,10 @@ export default class AwsKmsError extends Error {
    */
   readonly _isCustomError = true
   /**
+   * Flag to identify if error is a KmsError.
+   */
+  readonly _isKmsError = true
+  /**
    * Flag to identify if error is a AwsKmsError.
    */
   readonly _isAwsKmsError = true

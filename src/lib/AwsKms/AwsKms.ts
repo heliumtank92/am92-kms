@@ -25,17 +25,29 @@ import {
   EncryptDecryptOptions
 } from '../../TYPES'
 
+/**
+ * Class to execute KMS methods using AWS KMS
+ *
+ * @class
+ */
 export default class AwsKms {
+  /**
+   * Configurations used for AWS KMS
+   */
   CONFIG: AwsKmsConfig
+  /**
+   * AWS KMS client instance
+   */
   client: KMSClient
 
+  /**
+   * Creates an instance of AwsKms.
+   *
+   * @constructor
+   * @param config
+   */
   constructor(config: AwsKmsConfig) {
-    this.CONFIG = config
-
-    if (!this.CONFIG.AWS_KEY_ID) {
-      throw new AwsKmsError(this.CONFIG, INVALID_CONFIG_ERROR)
-    }
-
+    this.CONFIG = validateConfig(config)
     this.client = new KMSClient(this.CONFIG.AWS_CONNECTION_CONFIG)
 
     this.generateDataKey = this.generateDataKey.bind(this)
@@ -44,7 +56,13 @@ export default class AwsKms {
     this.decrypt = this.decrypt.bind(this)
   }
 
-  async generateDataKey() {
+  /**
+   * Generates encryption keys for symmetric encryption algorithm
+   *
+   * @async
+   * @returns
+   */
+  async generateDataKey(): Promise<DataKeyObject> {
     try {
       const { AWS_KEY_ID, KEY_SPEC, KEY_FORMAT } = this.CONFIG
       const params: GenerateDataKeyCommandInput = {
@@ -67,7 +85,13 @@ export default class AwsKms {
     }
   }
 
-  async generateDataKeyPair() {
+  /**
+   * Generates encryption keys for asymmetric encryption algorithm
+   *
+   * @async
+   * @returns
+   */
+  async generateDataKeyPair(): Promise<DataKeyPairObject> {
     try {
       const { AWS_KEY_ID, KEY_PAIR_SPEC, KEY_FORMAT } = this.CONFIG
       const params: GenerateDataKeyPairCommandInput = {
@@ -98,17 +122,27 @@ export default class AwsKms {
     }
   }
 
+  /**
+   * Encrypts a given string using AES-256-CBC
+   *
+   * @async
+   * @param [plainText='']
+   * @param [options]
+   * @returns
+   */
   async encrypt(
     plainText: string = '',
-    options: EncryptDecryptOptions = {}
+    options?: EncryptDecryptOptions
   ): Promise<string> {
     try {
-      const { AWS_KEY_ID, CIPHER_TEXT_FORMAT } = this.CONFIG
-      const { cipherTextFormat = CIPHER_TEXT_FORMAT } = options
-      const params: EncryptCommandInput = {
-        KeyId: AWS_KEY_ID,
-        Plaintext: plainText
-      }
+      const { AWS_KEY_ID, CIPHER_TEXT_FORMAT, PLAIN_TEXT_FORMAT } = this.CONFIG
+      const {
+        cipherTextFormat = CIPHER_TEXT_FORMAT,
+        plainTextFormat = PLAIN_TEXT_FORMAT
+      } = options || {}
+
+      const Plaintext = Buffer.from(plainText, plainTextFormat)
+      const params: EncryptCommandInput = { KeyId: AWS_KEY_ID, Plaintext }
       const command = new EncryptCommand(params)
       const response = await this.client.send(command)
 
@@ -123,16 +157,25 @@ export default class AwsKms {
     }
   }
 
+  /**
+   * Decrypts a given string using AES-256-CBC
+   *
+   * @async
+   * @param [ciphertext='']
+   * @param [options]
+   * @returns
+   */
   async decrypt(
     ciphertext: string = '',
-    options: EncryptDecryptOptions = {}
+    options?: EncryptDecryptOptions
   ): Promise<string> {
     try {
       const { AWS_KEY_ID, CIPHER_TEXT_FORMAT, PLAIN_TEXT_FORMAT } = this.CONFIG
       const {
         cipherTextFormat = CIPHER_TEXT_FORMAT,
         plainTextFormat = PLAIN_TEXT_FORMAT
-      } = options
+      } = options || {}
+
       const CiphertextBlob = Buffer.from(ciphertext, cipherTextFormat)
 
       const params: DecryptCommandInput = { KeyId: AWS_KEY_ID, CiphertextBlob }
@@ -147,4 +190,14 @@ export default class AwsKms {
       throw new AwsKmsError(error, DECRYPT_ERROR)
     }
   }
+}
+
+/** @ignore */
+function validateConfig(config: AwsKmsConfig): AwsKmsConfig {
+  const { AWS_KEY_ID } = config
+  if (!AWS_KEY_ID) {
+    throw new AwsKmsError(config, INVALID_CONFIG_ERROR)
+  }
+
+  return config
 }

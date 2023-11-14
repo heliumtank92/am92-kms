@@ -25,9 +25,23 @@ import {
   NodeKmsExtendedConfig
 } from '../../TYPES'
 
+/**
+ * Class to execute KMS methods using Node Crypto
+ *
+ * @class
+ */
 export default class NodeKms {
+  /**
+   * Configurations used for Node Crypto
+   */
   CONFIG: NodeKmsExtendedConfig
 
+  /**
+   * Creates an instance of NodeKms.
+   *
+   * @constructor
+   * @param config
+   */
   constructor(config: NodeKmsConfig) {
     this.CONFIG = validateConfigAndExtend(config)
 
@@ -37,7 +51,13 @@ export default class NodeKms {
     this.decrypt = this.decrypt.bind(this)
   }
 
-  async generateDataKey() {
+  /**
+   * Generates encryption keys for symmetric encryption algorithm
+   *
+   * @async
+   * @returns
+   */
+  async generateDataKey(): Promise<DataKeyObject> {
     try {
       const { KEY_ALGO, KEY_LENGTH, KEY_FORMAT } = this.CONFIG
       const options = { length: KEY_LENGTH }
@@ -58,7 +78,13 @@ export default class NodeKms {
     }
   }
 
-  async generateDataKeyPair() {
+  /**
+   * Generates encryption keys for asymmetric encryption algorithm
+   *
+   * @async
+   * @returns
+   */
+  async generateDataKeyPair(): Promise<DataKeyPairObject> {
     try {
       const { KEY_PAIR_ALGO, KEY_PAIR_LENGTH, KEY_FORMAT } = this.CONFIG
       const options = { modulusLength: KEY_PAIR_LENGTH }
@@ -87,9 +113,17 @@ export default class NodeKms {
     }
   }
 
+  /**
+   * Encrypts a given string using AES-256-CBC. The key and IV are as defined in `CONFIG.MASTER_KEY_HEX` and `CONFIG.MASTER_IV_HEX` respectively.
+   *
+   * @async
+   * @param [plainText='']
+   * @param [options]
+   * @returns
+   */
   async encrypt(
     plainText: string = '',
-    options: EncryptDecryptOptions = {}
+    options?: EncryptDecryptOptions
   ): Promise<string> {
     const {
       MASTER_KEY_BUFFER,
@@ -101,16 +135,17 @@ export default class NodeKms {
     const {
       cipherTextFormat = CIPHER_TEXT_FORMAT,
       plainTextFormat = PLAIN_TEXT_FORMAT
-    } = options
+    } = options || {}
 
     try {
+      const plainTextBuffer = Buffer.from(plainText, plainTextFormat)
       const encryptor = crypto.createCipheriv(
         ENCRYPTION_ALGO,
         MASTER_KEY_BUFFER,
         MASTER_IV_BUFFER
       )
       const cipherTextBuffer = Buffer.concat([
-        encryptor.update(plainText, plainTextFormat),
+        encryptor.update(plainTextBuffer),
         encryptor.final()
       ])
       const cipherText = cipherTextBuffer.toString(cipherTextFormat)
@@ -121,13 +156,21 @@ export default class NodeKms {
     }
   }
 
+  /**
+   * Decrypts a given string using AES-256-CBC. The key and IV are as defined in `CONFIG.MASTER_KEY_HEX` and `CONFIG.MASTER_IV_HEX` respectively.
+   *
+   * @async
+   * @param [ciphertext='']
+   * @param [options]
+   * @returns
+   */
   async decrypt(
     ciphertext: string = '',
-    options: EncryptDecryptOptions = {}
+    options?: EncryptDecryptOptions
   ): Promise<string> {
     const {
-      MASTER_KEY_HEX,
-      MASTER_IV_HEX,
+      MASTER_KEY_BUFFER,
+      MASTER_IV_BUFFER,
       CIPHER_TEXT_FORMAT,
       PLAIN_TEXT_FORMAT
     } = this.CONFIG
@@ -135,17 +178,15 @@ export default class NodeKms {
     const {
       cipherTextFormat = CIPHER_TEXT_FORMAT,
       plainTextFormat = PLAIN_TEXT_FORMAT
-    } = options
+    } = options || {}
 
-    const keyBuffer = Buffer.from(MASTER_KEY_HEX, 'hex')
-    const ivBuffer = Buffer.from(MASTER_IV_HEX, 'hex')
     const cipherTextBuffer = Buffer.from(ciphertext, cipherTextFormat)
 
     try {
       const decryptor = crypto.createDecipheriv(
         ENCRYPTION_ALGO,
-        keyBuffer,
-        ivBuffer
+        MASTER_KEY_BUFFER,
+        MASTER_IV_BUFFER
       )
       const plainTextBuffer = Buffer.concat([
         decryptor.update(cipherTextBuffer),
@@ -160,29 +201,43 @@ export default class NodeKms {
   }
 }
 
+/** @ignore */
 function validateConfigAndExtend(config: NodeKmsConfig): NodeKmsExtendedConfig {
-  const { KEY_SPEC, KEY_PAIR_SPEC, MASTER_KEY_HEX, MASTER_IV_HEX } = config
+  const {
+    KEY_SPEC = '',
+    KEY_PAIR_SPEC = '',
+    MASTER_KEY_HEX,
+    MASTER_IV_HEX
+  } = config
 
   if (!MASTER_KEY_HEX) {
     throw new NodeKmsError(config, INVALID_CONFIG_ERROR)
   }
 
+  if (!MASTER_IV_HEX) {
+    throw new NodeKmsError(config, INVALID_CONFIG_ERROR)
+  }
+
   if (!VALID_KEY_SPECS.includes(KEY_SPEC)) {
-    throw new NodeKmsError({ KEY_SPEC }, INVALID_KEY_SPEC_ERROR)
+    throw new NodeKmsError(
+      { KEY_SPEC, VALID_KEY_SPECS },
+      INVALID_KEY_SPEC_ERROR
+    )
   }
 
   if (!VALID_KEY_PAIR_SPECS.includes(KEY_PAIR_SPEC)) {
-    throw new NodeKmsError({ KEY_PAIR_SPEC }, INVALID_KEY_PAIR_SPEC_ERROR)
+    throw new NodeKmsError(
+      { KEY_PAIR_SPEC, VALID_KEY_PAIR_SPECS },
+      INVALID_KEY_PAIR_SPEC_ERROR
+    )
   }
 
   const keySpecArray = KEY_SPEC.split('_')
   const KEY_ALGO = 'aes'
-  // TODO: const KEY_ALGO = keySpecArray[0].toLowerCase()
   const KEY_LENGTH = parseInt(keySpecArray[1], 10)
 
   const keyPairSpecArray = KEY_PAIR_SPEC.split('_')
   const KEY_PAIR_ALGO = 'rsa'
-  // TODO: const KEY_PAIR_ALGO = keyPairSpecArray[0].toLowerCase()
   const KEY_PAIR_LENGTH = parseInt(keyPairSpecArray[1], 10)
 
   const MASTER_KEY_BUFFER = Buffer.from(MASTER_KEY_HEX, 'hex')

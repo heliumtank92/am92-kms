@@ -21,6 +21,10 @@ export default class NodeKmsError extends Error {
    */
   readonly _isCustomError = true
   /**
+   * Flag to identify if error is a KmsError.
+   */
+  readonly _isKmsError = true
+  /**
    * Flag to identify if error is a NodeKmsError.
    */
   readonly _isNodeKmsError = true

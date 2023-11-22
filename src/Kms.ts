@@ -1,7 +1,7 @@
 import { NodeKms } from './lib/NodeKms'
 import { AwsKms } from './lib/AwsKms'
 import CONFIG from './CONFIG'
-import KmsError from './KmsError'
+import { KmsError } from './KmsError'
 import { INVALID_CONFIG_ERROR } from './ERRORS'
 import { AwsKmsConfig, KmsConfig, NodeKmsConfig } from './TYPES'
 

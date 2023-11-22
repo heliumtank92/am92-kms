@@ -15,7 +15,7 @@ const DEFAULT_ERROR_CODE = 'NodeKmsError::GENERIC'
  * @typedef {NodeKmsError}
  * @extends {Error}
  */
-export default class NodeKmsError extends Error {
+export class NodeKmsError extends Error {
   /**
    * Flag to identify if error is a custom error.
    */
@@ -55,7 +55,7 @@ export default class NodeKmsError extends Error {
    * @param [e] Any Error instance to wrap with NodeKmsError.
    * @param [eMap] KmsErrorMap to rewrap error for better understanding.
    */
-  constructor(e: any, eMap: KmsErrorMap) {
+  constructor(e?: any, eMap?: KmsErrorMap) {
     super()
 
     this.service = SERVICE

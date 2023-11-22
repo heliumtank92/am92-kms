@@ -15,7 +15,7 @@ const DEFAULT_ERROR_CODE = 'AwsKmsError::GENERIC'
  * @typedef {AwsKmsError}
  * @extends {Error}
  */
-export default class AwsKmsError extends Error {
+export class AwsKmsError extends Error {
   /**
    * Flag to identify if error is a custom error.
    */
@@ -55,10 +55,10 @@ export default class AwsKmsError extends Error {
    * @param [e] Any Error instance to wrap with AwsKmsError.
    * @param [eMap] KmsErrorMap to rewrap error for better understanding.
    */
-  constructor(e: any, eMap: KmsErrorMap) {
+  constructor(e?: any, eMap?: KmsErrorMap) {
     super()
 
-    const { $metadata: { httpStatusCode: eStatusCode = 500 } = {} } = e
+    const { $metadata: { httpStatusCode: eStatusCode = 500 } = {} } = e || {}
 
     this.service = SERVICE
     this.message = eMap?.message || e?.message || DEFAULT_ERROR_MSG

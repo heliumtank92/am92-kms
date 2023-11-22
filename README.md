@@ -59,7 +59,7 @@ export KMS_AWS_KEY_ID=''
 
 ## Creating a KMS Instance
 ```javascript
-import Kms from '@am92/kms'
+import { Kms } from '@am92/kms'
 
 const kms = new Kms()
 export default kms
@@ -68,7 +68,7 @@ export default kms
 If you wish to pass your custom 'config' to Kms Class, then you can build it as follows:
 
 ```javascript
-import Kms from '@am92/kms'
+import { Kms } from '@am92/kms'
 
 const config = {
   KMS_TYPE: 'NODE'

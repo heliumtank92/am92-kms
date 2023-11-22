@@ -87,11 +87,11 @@ export KMS_AWS_KEY_ID=&#39;&#39;</code></pre></div><p><em>Note:</em></p>
 <br />
 
 <h2>Creating a KMS Instance</h2>
-<div><pre class="line-numbers"><code class="language-javascript">import Kms from &#39;&#64;am92/kms&#39;
+<div><pre class="line-numbers"><code class="language-javascript">import { Kms } from &#39;&#64;am92/kms&#39;
 
 const kms = new Kms()
 export default kms</code></pre></div><p>If you wish to pass your custom &#39;config&#39; to Kms Class, then you can build it as follows:</p>
-<div><pre class="line-numbers"><code class="language-javascript">import Kms from &#39;&#64;am92/kms&#39;
+<div><pre class="line-numbers"><code class="language-javascript">import { Kms } from &#39;&#64;am92/kms&#39;
 
 const config = {
   KMS_TYPE: &#39;NODE&#39;

@@ -1,4 +1,2 @@
-import AwsKms from './AwsKms'
-import AwsKmsError from './AwsKmsError'
-
-export { AwsKms, AwsKmsError }
+export * from './AwsKms'
+export * from './AwsKmsError'

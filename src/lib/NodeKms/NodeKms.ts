@@ -1,5 +1,5 @@
 import crypto from 'crypto'
-import NodeKmsError from './NodeKmsError'
+import { NodeKmsError } from './NodeKmsError'
 import {
   VALID_KEY_SPECS,
   VALID_KEY_PAIR_SPECS,
@@ -30,7 +30,7 @@ import {
  *
  * @class
  */
-export default class NodeKms {
+export class NodeKms {
   /**
    * Configurations used for Node Crypto
    */

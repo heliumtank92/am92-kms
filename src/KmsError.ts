@@ -15,7 +15,7 @@ const DEFAULT_ERROR_CODE = 'KmsError::GENERIC'
  * @typedef {KmsError}
  * @extends {Error}
  */
-export default class KmsError extends Error {
+export class KmsError extends Error {
   /**
    * Flag to identify if error is a custom error.
    */

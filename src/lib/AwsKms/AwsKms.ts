@@ -9,7 +9,7 @@ import {
   GenerateDataKeyCommandInput,
   GenerateDataKeyPairCommandInput
 } from '@aws-sdk/client-kms'
-import AwsKmsError from './AwsKmsError'
+import { AwsKmsError } from './AwsKmsError'
 
 import {
   INVALID_CONFIG_ERROR,
@@ -30,7 +30,7 @@ import {
  *
  * @class
  */
-export default class AwsKms {
+export class AwsKms {
   /**
    * Configurations used for AWS KMS
    */
